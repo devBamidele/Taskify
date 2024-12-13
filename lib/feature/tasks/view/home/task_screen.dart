@@ -47,37 +47,6 @@ class TaskScreen extends HookConsumerWidget {
       isNew ? TaskPriority.low : task!.priority,
     );
 
-    final hasChanges = useState<bool>(false);
-
-    void checkForChanges() {
-      final isModified = title.text != (isNew ? '' : task!.title) ||
-          desc.text != (isNew ? '' : task!.subTitle) ||
-          selectedDate.value != (isNew ? DateTime.now() : task!.time) ||
-          selectedTime.value !=
-              TimeOfDay.fromDateTime((isNew ? DateTime.now() : task!.time)) ||
-          selectedPriority.value != (isNew ? TaskPriority.low : task!.priority);
-
-      hasChanges.value = isModified;
-    }
-
-    useEffect(() {
-      checkForChanges();
-
-      title.addListener(checkForChanges);
-      desc.addListener(checkForChanges);
-
-      return () {
-        title.removeListener(checkForChanges);
-        desc.removeListener(checkForChanges);
-      };
-    }, [
-      title,
-      desc,
-      selectedDate.value,
-      selectedTime.value,
-      selectedPriority.value
-    ]);
-
     void editDate() async {
       final now = DateTime.now();
       final date = await showDatePicker(
@@ -277,9 +246,7 @@ class TaskScreen extends HookConsumerWidget {
         Padding(
           padding: EdgeInsets.only(bottom: 30.h),
           child: AppButton(
-            onPress: hasChanges.value
-                ? validateCreate
-                : null, // Button enabled only if there are changes
+            onPress: validateCreate,
             text: isNew ? 'Add Task' : 'Save Changes',
             loading: isSaving(),
           ),
